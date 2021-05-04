@@ -1,13 +1,8 @@
 import discord
-import os
-from config import TOKEN
 from discord.ext import commands
+from config import TOKEN
 
-# Fun commands
-
-from time import sleep
-
-# Commands
+# Commands extensions
 startup_extensions = [
     # Fun commands
     "fun.repeat",
@@ -30,7 +25,12 @@ async def on_ready():
 
 @bot.command()
 async def load(extension_name : str):
-    """Loads an extension."""
+    """[Extension loading]
+    It loads every necesary command
+    Args:
+        extension_name (str): [Extension to load]
+    """
+    
     try:
         bot.load_extension(extension_name)
     except (AttributeError, ImportError) as e:
@@ -40,7 +40,12 @@ async def load(extension_name : str):
 
 @bot.command()
 async def unload(extension_name : str):
-    """Unloads an extension."""
+    """[Unloading extension]
+    Unloads the specified extension
+    Args:
+        extension_name (str): [Extension to unload]
+    """
+    
     bot.unload_extension(extension_name)
     await bot.say("{} unloaded.".format(extension_name))
 
