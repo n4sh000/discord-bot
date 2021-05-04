@@ -1,5 +1,6 @@
 import discord
 import os
+from config import TOKEN
 from discord.ext import commands
 
 # Fun commands
@@ -50,4 +51,4 @@ if __name__ == "__main__":
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
 
-bot.run("ODMzMTQ2NTI0OTI1NTU4Nzg0.YHuGKg.lEUp6mT115CoxKLMov3vZ_RIA6k")
+bot.run(TOKEN)
