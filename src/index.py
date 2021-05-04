@@ -9,8 +9,11 @@ from time import sleep
 
 # Commands
 startup_extensions = [
+    # Fun commands
     "fun.repeat",
     "fun.random_cap",
+    "fun.helloworld",
+    # Useful commands
     "useful.google",
 ]
 
@@ -42,7 +45,6 @@ async def unload(extension_name : str):
     await bot.say("{} unloaded.".format(extension_name))
 
 
-# If bot's connected...
 if __name__ == "__main__":
     for extension in startup_extensions:
         try:
