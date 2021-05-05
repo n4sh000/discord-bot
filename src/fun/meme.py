@@ -65,12 +65,12 @@ class Meme(commands.Cog):
                          continue
                
           # Check if the post has an image
-          if 'i.redd.it/award_' in self.post_image[0]:
+          if 'i.redd.it/award_' in self.post_image[0] or 'i.redd.it/t0' in self.post_image[0]:
                image_state = False
                while image_state == False:
                     try:
                          self.get_subreddit_post_image()
-                         if 'i.redd.it/award_' in self.post_image[0]:
+                         if 'i.redd.it/award_' in self.post_image[0] or 'i.redd.it/t0' in self.post_image[0]:
                               continue
                          else:
                               break
