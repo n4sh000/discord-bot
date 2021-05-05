@@ -23,7 +23,7 @@ class Dumb(commands.Cog):
                     break
           await ctx.send(self.all)
           self.all = ''
-     
+          self.count = 0
     
           
 def setup(bot):

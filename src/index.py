@@ -9,6 +9,7 @@ startup_extensions = [
     "fun.random_cap",
     "fun.helloworld",
     "fun.dumb",
+    "fun.meme",
     # Useful commands
     "useful.google",
 ]
