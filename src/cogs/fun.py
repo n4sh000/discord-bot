@@ -2,7 +2,7 @@ import random
 from time import sleep
 from discord.ext import commands
 from string import digits as digits_string
-
+import string
 class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -44,7 +44,12 @@ class Fun(commands.Cog):
         for letter in message:
             try:
                 if self.count % 2 is 1:
+                    if letter not in string.ascii_letters or letter not in string.ascii_lowercase or letter not in string.ascii_uppercase:
+                        self.all += letter
+                        
+                    
                     self.all += letter.upper()
+                    
                 else:
                     self.all += letter.lower()
 

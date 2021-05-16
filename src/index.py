@@ -11,7 +11,7 @@ startup_extensions = [
     "cogs.useful",
     "cogs.help",
     "cogs.on_error",
-    "cogs.nsfw"
+    "cogs.rpg",
 ]
 
 # Bot instance
@@ -24,7 +24,19 @@ async def on_ready():
     await bot.change_presence(activity=game)
 
     print('Exitosamente iniciado con el nombre de usuario {0.user}'.format(bot))
-
+    
+@bot.command()
+async def ping(ctx):
+    a = ''
+    latency = str(round(bot.latency, 3))
+    for letter in latency:
+        if letter.startswith('0') or letter.startswith('.'):
+            continue
+        else:
+            a += str(letter)
+    await ctx.send('{0}ms'.format(a))
+    a = ''
+    latency = ''
 
 @bot.command()
 async def load(extension_name: str):

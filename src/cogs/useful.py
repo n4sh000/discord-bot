@@ -54,6 +54,7 @@ class Google(commands.Cog):
     @commands.command()
     async def avatar(self, ctx, user: discord.User):
         try:
+            
             embed = discord.Embed(title=f"foto de perfil de {user}", colour=discord.Colour.random())
         except Exception:
             user = ctx.message.author
@@ -62,9 +63,11 @@ class Google(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(name='clear')
-    async def clear(self, ctx, limit=5):
+    async def clear(self, ctx, limit='5'):
+        if str(limit) == '-a':
+            limit = int(1000)
         if ctx.message.author.guild_permissions.administrator:
-            await ctx.channel.purge(limit=limit)
+            await ctx.channel.purge(limit=int(limit))
         else:
             await ctx.send("No puedes usar este comando porque no eres administrador")
 
