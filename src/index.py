@@ -20,7 +20,7 @@ bot = commands.Bot(command_prefix='py!', description='Beta version of this bot',
 
 @bot.event
 async def on_ready():
-    game = discord.Game("py!")
+    game = discord.Game("py!help")
     await bot.change_presence(activity=game)
 
     print('Exitosamente iniciado con el nombre de usuario {0.user}'.format(bot))

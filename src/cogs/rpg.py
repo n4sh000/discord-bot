@@ -1,4 +1,6 @@
+# from sqlite3.dbapi2 import connect
 import discord
+# from discord import colour
 from discord.ext import commands
 import sqlite3
 import asyncio
@@ -8,6 +10,8 @@ class Rpg(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.list_data = []
+    
+    
     
     def shop_connection(self):
         connection = sqlite3.connect('/home/lvoidi/Desktop/discord/src/database/shop.db')
@@ -31,31 +35,81 @@ class Rpg(commands.Cog):
 
 
         # ~ Lista de productos de items ~ #
-        """
+        
         connection_items = sqlite3.connect('/home/lvoidi/Desktop/discord/src/database/shop.db')
         cursor_items = connection_items.cursor()
         
-        cursor_items.execute('SELECT * FROM SHOP_ITEMS')
+        cursor_items.execute('SELECT * FROM ITEM')
         self.the_items = cursor_items.fetchall()
         connection_items.commit()
         connection_items.close()
-        """
-    @commands.command()
-    async def rhunt(self, ctx):
-        pass
-    @commands.command()
-    async def rfight(self, ctx, user):
-        pass
+        
 
+    def is_in_database(self, user):
+        connect = sqlite3.connect('/home/lvoidi/Desktop/discord/src/database/users_data.db')
+        cursor = connect.cursor()
+        cursor.execute(r'SELECT * FROM USERS')
+        users = cursor.fetchall()
+        for usr in users:
+            if usr[0] == user:
+                return True
+            else:
+                continue
+        connect.commit()
+        connect.close()
 
+    def add_user_in_database(self, id: int, user: str):
+        connect = sqlite3.connect('/home/lvoidi/Desktop/discord/src/database/users_data.db')
+        cursor = connect.cursor()
+        registro = [
+            (int(id), f'{user}', 100, 1, 1, 0)
+        ]
+        try:
+            cursor.executemany('INSERT INTO USERS VALUES(?,?,?,?,?,?)', registro)
+            cursor.execute(f"CREATE TABLE {user}_INV(PRODUCT VARCHAR(50),USAGE CHAR)")
+        except Exception as e:
+            print("Excepcion found:", type(e), e)
+            return False
+        connect.commit()
+        connect.close()
+
+    def get_profile(self, user: discord.User, id):
+        connection = sqlite3.connect('/home/lvoidi/Desktop/discord/src/database/users_data.db')   
+        cursor = connection.cursor()
+        
+        cursor.execute(f'SELECT * FROM USERS')
+        self.the_profiles = cursor.fetchall()
+        
+        connection.commit()
+        connection.close() 
+
+        count = 0
+        for profile in self.the_profiles:
+            if profile[0] == id:
+                return f"""
+                    **Username**: ```{profile[1]}```
+                    **Doblones**: ```{profile[2]}```
+                    **Nivel**: ```{profile[3]}```
+                    **Fase**: ```{profile[4]}```
+                    **XP actual**: ```{profile[5]}```  
+            
+            """
+            else:
+                if count == len(self.the_profiles):
+                    return False
+                else:
+                    continue
+            
+            count += 1
+            
 
     @commands.command()
-    async def rshop(self, ctx):
+    async def shop(self, ctx):
         self.shop_connection()
         the_armors = self.the_armors
         the_weapons = self.the_weapons
-        # the_items = self.the_items
-        
+        the_items = self.the_items
+        page = 0
         embed_color = discord.Color.gold()
         
         # ~ Embed de la pagina de armaduras ~ #
@@ -66,7 +120,7 @@ class Rpg(commands.Cog):
             """,
             colour=embed_color
         )
-        embed_armor.set_footer(text='Página Armaduras', icon_url=ctx.author.avatar_url)
+        embed_armor.set_footer(text='Página 1', icon_url=ctx.author.avatar_url)
         embed_armor.set_thumbnail(url='https://i.gifer.com/origin/4c/4cf9c4b3173ec5a3ba877daed7c3309f_w200.gif')
         
         # ~ Embed de la página de armas ~ #
@@ -79,6 +133,19 @@ class Rpg(commands.Cog):
         embed_weapons.set_footer(text='Página 2', icon_url=ctx.author.avatar_url)
         embed_weapons.set_thumbnail(url='http://1.bp.blogspot.com/-Dz1WMgUXPSM/VUpYrBNDcNI/AAAAAAAACdY/R9JLNYs8fHo/s1600/flame_lancer_entity_000_hit.gif')
         
+        # ~ Embed de la página de items ~ #
+        embed_items = discord.Embed(
+            title="Tienda de items para RPG!",
+            description="""Puedes ejecutar el comando `py!buy (ID)` para **comprar un item!**
+            reacciona con ⬅/➡ para navegar entre las diferentes páginas, y ❌ **para salir**""",
+            colour=embed_color
+        )
+        embed_items.set_footer(text='Página 3', icon_url=ctx.author.avatar_url)
+        embed_items.set_thumbnail(url='https://i.pinimg.com/originals/4e/b7/bd/4eb7bda23bf456a53fd6ba84c1048ba6.gif')
+        
+        
+        
+        
         list_emojis = [
             '❌',
             '⬅',
@@ -89,7 +156,7 @@ class Rpg(commands.Cog):
             return user == ctx.message.author and str(reaction.emoji) in list_emojis
         
         # ~ embed de las armaduras ~ #
-        count = 0
+        
         embed_armor.add_field(
             name='`Sección de armaduras`',
             value='·',
@@ -130,6 +197,26 @@ class Rpg(commands.Cog):
                 inline=True
             )
         
+        embed_items.add_field(
+            name='`Sección de items`',
+            value='·',
+            inline=False
+        )
+        
+        for item in the_items:
+            embed_items.add_field(
+                name=item[1],
+                value=f"""
+                ```{item[2]}```
+                **ID**: `{item[0]}`
+                **precio**: `{item[3]}`
+                **nivel necesario**:`{item[4]}`
+                **stage necesario**:`{item[5]}`
+                """,
+                inline=True
+            )
+        
+        
         message = await ctx.send(embed = embed_armor)
         for emoji in list_emojis:
             await message.add_reaction(emoji)
@@ -147,27 +234,65 @@ class Rpg(commands.Cog):
                     elif page == 1:
                         await message.edit(embed = embed_armor)
                         page -= 1
+                    elif page == 2:
+                        await message.edit(embed = embed_weapons)
+                        page -= 1
+                    
                 elif reaction.emoji == '➡':
-                    page = 1
-                    await message.edit(embed = embed_weapons)
+                    if page == 1:
+                        page += 1
+                        await message.edit(embed = embed_items)
+                        
+                    else:
+                        page += 1
+                        await message.edit(embed = embed_weapons)
                     
             except asyncio.TimeoutError:
                 await ctx.send("Se ha pasado el tiempo para reaccionar")
                 return
                 
             
-        
-        
-        
-        
-        
     @commands.command()
-    async def revent(self, ctx):
-        pass
-    
+    async def register(self, ctx, username):        
+        if self.is_in_database(ctx.message.author.id):
+            await ctx.send("Ese nombre de usuario ya está registrado")
+            return
+        else:
+            useradd = self.add_user_in_database(id=ctx.message.author.id, user=username)
+            if useradd == False:
+                await ctx.send("Ya estás registrado!")
+                return
+            embed = discord.Embed(
+                title="Registro completado",
+                description=f"Te has registrado en nuestra base de datos como {username} con la id de {ctx.message.author.id}",
+                colour=discord.Color.dark_gold(),
+            )
+            embed.set_thumbnail(url=ctx.message.author.avatar_url)
+            await ctx.send(embed = embed)
+
+
     @commands.command()
-    async def rstage(self, ctx):
-        pass
+    async def profile(self, ctx):
+        profile = self.get_profile(ctx.message.author.mention, ctx.message.author.id)
+        if self.is_in_database(ctx.message.author.id) == False:
+            embed = discord.Embed(
+            title=f'No se ha encontrado tu perfil, {ctx.message.author}, prueba py!register (nombre de usuario) para registrarte',
+            colour=discord.Color.red()
+            )
+            await ctx.send(embed = embed)
+        
+        the_profile = discord.Embed(
+            title=f'Perfil de {ctx.message.author}',
+            description=f'{ctx.message.author.mention}',
+            colour=discord.Color.lighter_grey()
+        )
+        the_profile.set_thumbnail(url='https://i.gifer.com/LWEI.gif')
+        the_profile.set_footer(text=ctx.message.author, icon_url=ctx.message.author.avatar_url)
+        the_profile.add_field(name="Estadísticas del jugador",
+                        value=profile)
+        await ctx.send(embed=the_profile)
+        
+        
 
 
 

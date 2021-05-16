@@ -1,6 +1,6 @@
 import sqlite3
 
-c = sqlite3.connect('/home/lvoidi/Desktop/discord/src/database/shop.db')
+c = sqlite3.connect('/home/lvoidi/Desktop/discord/src/database/users_data.db')
 cr = c.cursor()
 """
 armors = [
@@ -129,6 +129,9 @@ items = [
      )
 ]
 """
+
+cr.execute("CREATE TABLE USERS(ID INTEGER PRIMARY KEY, USERNAME VARCHAR(50) UNIQUE, BALANCE INTEGER, LEVEL INTEGER, STAGE INTEGER, XP INTEGER)")
+
 
 c.commit()
 c.close()
