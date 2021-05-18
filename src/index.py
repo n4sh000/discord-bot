@@ -1,17 +1,21 @@
 import discord
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
-
+import colorama as c
 from config import TOKEN
-
+r = c.Style.RESET_ALL
+g = c.Fore.LIGHTGREEN_EX
+m = c.Fore.LIGHTMAGENTA_EX
+re = c.Fore.LIGHTRED_EX
 # Commands extensions
 startup_extensions = [
     "cogs.fun",
-    "cogs.meme",
+    "cogs.meme__",
     "cogs.useful",
     "cogs.help",
     "cogs.on_error",
-    "cogs.rpg",
+    "cogs.rpg.rpg",
+    "cogs.rpg.rpg_2"
 ]
 
 # Bot instance
@@ -23,7 +27,7 @@ async def on_ready():
     game = discord.Game("py!help")
     await bot.change_presence(activity=game)
 
-    print('Exitosamente iniciado con el nombre de usuario {0.user}'.format(bot))
+    print(f'[{re}*{r}] {m}Exitosamente iniciado con el nombre de usuario {bot.user}{r}')
     
 @bot.command()
 async def ping(ctx):
@@ -69,9 +73,11 @@ async def unload(extension_name: str):
 if __name__ == "__main__":
     for extension in startup_extensions:
         try:
+            print(f'[{m}*{r}] Loaded extension {g}{extension}{r}')
             bot.load_extension(extension)
         except Exception as e:
             exc = '{}: {}'.format(type(e).__name__, e)
             print('Failed to load extension {}\n{}'.format(extension, exc))
 
+print(f'[{g}*{r}] Token del bot {re}cargado{r}')
 bot.run(TOKEN)

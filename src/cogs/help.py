@@ -1,6 +1,11 @@
 import discord
 from discord.ext import commands
-
+import colorama as c
+r = c.Style.RESET_ALL
+g = c.Fore.LIGHTGREEN_EX
+m = c.Fore.LIGHTMAGENTA_EX
+re = c.Fore.LIGHTRED_EX
+b = c.Fore.CYAN
 
 class Help(commands.Cog):
     def __init__(self, bot):

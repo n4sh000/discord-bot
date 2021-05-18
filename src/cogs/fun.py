@@ -3,8 +3,15 @@ from time import sleep
 from discord.ext import commands
 from string import digits as digits_string
 import string
+import colorama as c
+r = c.Style.RESET_ALL
+g = c.Fore.LIGHTGREEN_EX
+m = c.Fore.LIGHTMAGENTA_EX
+re = c.Fore.LIGHTRED_EX
+
 class Fun(commands.Cog):
     def __init__(self, bot):
+
         self.bot = bot
         self.all = ''
         self.count = 0
@@ -40,10 +47,11 @@ class Fun(commands.Cog):
 
     @commands.command()
     async def dumb(self, ctx, *, message: str):
+        print(f'[{g}*{r}] {re}{ctx.message.author}{r} ha llamado el comando dumb, con el mensaje {message}')
         await ctx.message.delete()
         for letter in message:
             try:
-                if self.count % 2 is 1:
+                if self.count % 2 == 1:
                     if letter not in string.ascii_letters or letter not in string.ascii_lowercase or letter not in string.ascii_uppercase:
                         self.all += letter
                         
@@ -65,13 +73,14 @@ class Fun(commands.Cog):
 
     @commands.command()
     async def cap(self, ctx):
+        print(f'[{g}*{r}] {re}{ctx.message.author}{r} ha llamado el comando cap')
         await ctx.send(self.caps.get(random.randint(1, 17)))
 
         
         
     @commands.command()
     async def say(self, ctx, *, message):
-
+        print(f'[{g}*{r}] {re}{ctx.message.author}{r} ha llamado el comando say, con el mensaje {message}')
         id_usr = f'<@{ctx.author.id}>'
         """[repeat]
 
@@ -80,15 +89,15 @@ class Fun(commands.Cog):
         message ([str]): [mensaje a repetir]
         """
         self.message = message
-        if "im stupid" in self.message or self.message is "im stupid":
+        if "im stupid" in self.message or self.message == "im stupid":
             self.stupid = "yeah, i also think you are stupid"
             await ctx.send(self.stupid)
 
-        elif "im gay" in self.message or self.message is "im gay":
+        elif "im gay" in self.message or self.message == "im gay":
             self.gay = "yeah, i also think you are gay"
             await ctx.send(self.gay)
 
-        elif "nigga" in self.message or self.message is "nigga":
+        elif "nigga" in self.message or self.message == "nigga":
             await ctx.send("AYOOOOOO, exposed bro :face_with_raised_eyebrow: :camera_with_flash: {}".format(id_usr))
         else:
             await ctx.message.delete()

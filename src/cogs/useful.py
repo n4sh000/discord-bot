@@ -3,7 +3,11 @@ from discord.ext import commands
 from googlesearch import search
 
 from config import FORBIDDEN
-
+import colorama as c
+r = c.Style.RESET_ALL
+g = c.Fore.LIGHTGREEN_EX
+m = c.Fore.LIGHTMAGENTA_EX
+re = c.Fore.LIGHTRED_EX
 
 class Google(commands.Cog):
     """[Google class]
@@ -13,10 +17,12 @@ class Google(commands.Cog):
     """
 
     def __init__(self, bot):
+
         self.bot = bot
 
     @commands.command()
     async def google(self, ctx, *, query: str, results = 5):
+        print(f'[{g}*{r}] {re}{ctx.message.author}{r} ha llamado el comando google, con la query {m}{query}{r}')
         forbidden_word = False
         for word in query.split():
             for fword in FORBIDDEN:
@@ -42,6 +48,7 @@ class Google(commands.Cog):
 
     @commands.command()
     async def contact(self, ctx):
+        print(f'[{g}*{r}] {re}{ctx.message.author}{r} ha llamado el comando contact')
         color = discord.Colour.random()
         embed = discord.Embed(title="Formas de contratar al creador del bot", colour=color)
         embed.set_author(name="MrJakeSir")
@@ -53,6 +60,7 @@ class Google(commands.Cog):
 
     @commands.command()
     async def avatar(self, ctx, user: discord.User):
+        print(f'[{g}*{r}] {re}{ctx.message.author}{r} ha llamado el comando avatar, con el user {m}{user}{r}')
         try:
             
             embed = discord.Embed(title=f"foto de perfil de {user}", colour=discord.Colour.random())
@@ -64,6 +72,7 @@ class Google(commands.Cog):
 
     @commands.command(name='clear')
     async def clear(self, ctx, limit='5'):
+        print(f'[{g}*{r}] {re}{ctx.message.author}{r} ha llamado el comando clear, con el limite {m}{limit}{r}')
         if str(limit) == '-a':
             limit = int(1000)
         if ctx.message.author.guild_permissions.administrator:
