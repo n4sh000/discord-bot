@@ -15,7 +15,7 @@ startup_extensions = [
     "cogs.help",
     "cogs.on_error",
     "cogs.rpg.rpg",
-    "cogs.rpg.rpg_2"
+    "cogs.rpg.rpg_cogs"
 ]
 
 # Bot instance
