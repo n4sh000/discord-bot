@@ -41,6 +41,67 @@ async def ping(ctx):
     await ctx.send('{0}ms'.format(a))
     a = ''
     latency = ''
+    """
+@bot.command()
+async def xyz(ctx):
+    await ctx.message.delete()
+    embed = discord.Embed(
+        color=discord.Color.gold()
+    )
+    
+    embed.title = "Bienvenido a the door, el server para **programadores** y **amantes de la informatica**"
+    
+    embed.description = 
+>>> Primero que todo, escribe el comando **__py!verify__** para que pueda asignarte ***__el rol de miembro__***
+
+    ***Link permanente del server:*** https://discord.gg/4zDWYyrReW
+    
+    
+    embed.add_field(
+        name="¿Código fuente del bot?",
+        value='>>> Revisa el canal que dice "github"'
+    )
+    
+    embed.add_field(
+        name="¿Ayuda?",
+        value='>>> py!help es la solución!'
+    )
+    
+    embed.add_field(
+        name="Quiero aprender a programar!",
+        value='>>> Mira la sección de **cursos** c:'
+    )
+    
+    embed.add_field(
+        name="¿Creador del server?",
+        value=">>> Ehhh dificil de decir su nombre, dejame pensar... se ha llamado desde troll hasta void, es difícil"
+    )
+
+    embed.add_field(
+        name="¿Metodos de contacto?",
+        value=">>> El dm del owner está abierto!"
+    )
+    
+    embed.add_field(
+        name="¿Propósito del servidor?",
+        value=">>> Juntar a la mayor cantidad de amantes de la informática posibles!!"
+    )
+    embed.set_image(url='https://media.discordapp.net/attachments/844732529474535436/844736774324355083/thedoor.png?width=811&height=456')
+    
+    await ctx.send(embed = embed)
+    """
+
+@bot.command()
+async def verify(ctx):
+    try:
+        role = ctx.message.guild.get_role(844729557029748736)
+        await ctx.message.author.add_roles(role)
+        m = await ctx.send(">>> **Se ha dado el rol a {}**".format(ctx.message.author.mention))
+        await ctx.message.delete()
+        await m.delete(delay=1)
+    except Exception as e:
+        exc = '{} : {}'.format(type(3).__name__, e)
+        print(exc)
 
 @bot.command()
 async def load(extension_name: str):
