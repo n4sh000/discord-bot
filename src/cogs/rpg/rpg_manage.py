@@ -1,118 +1,327 @@
 import sqlite3
 
+class Item:
+    def __init__(self):
+        self.armors = {}
+        self.weapons = {}
+        self.items = {}
+        self.keywords_armors = [
+        'armor',
+        'armors',
+        'a',
+        'arm',
+        'amror',
+        'amorr',
+        'armosr',
+        ]
 
-class Rpg:
-    def shop_item(self, id: int, section: str):
-        """[summary]
+        self.keywords_weapons = [
+        'weapon',
+        'weapons',
+        'w',
+        'wpn',
+        'weapno',
+        'wepaon',
+        'weap',
+        ]
 
-        Args:
-            id (Integer): The id of the product
-            section (String): The section of the product (armor, weapon, item)
-        """
-        if section.lower() == "armor":
-            sec = 'ARMOR'
-        elif section.lower() == "weapon":
-            sec = 'WEAPON'
-        elif section.lower() == 'item':
-            sec = 'ITEM'
+        self.keywords_items = [
+        'item',
+        'items',
+        'i',
+        'itm',
+        'ietm',
+        'itme',
+        'tiem',
+        ]
+
+    def section_parser(self, section: str):
+        if section.lower() in self.keywords_armors:
+
+            return 'ARMOR'
+
+        elif section.lower() in self.keywords_weapons:
+            return 'WEAPON'
+
+        elif section.lower() in self.keywords_items:
+            return 'ITEM'
+
         else:
-            print("No entro")
             return False
 
-        connection = sqlite3.connect('/home/lvoidi/Desktop/discord/src/database/shop.db')
-        cursor = connection.cursor()
+    def get_armors(self,
+        where='',
+        inlist=False):
+        with sqlite3.connect('/home/lvoidi/Desktop/discord/src/database/shop.db') as connect:
+            cursor = connect.cursor()
+            if where == '':
 
-        cursor.execute(rf'SELECT * FROM {sec} WHERE ID={id}')
+                cursor.execute(r'''
+                                SELECT * FROM ARMOR 
 
-        the_item = cursor.fetchall()
-        print("confirmacion de error en {}".format(the_item))
-        for c in the_item:
-            self.name = c[1]
-            self.price = c[3]
-            self.lvl = c[4]
-            self.stg = c[5]
+                                ''')
+            else:
+                cursor.execute(f'''
+                                SELECT * FROM ARMOR WHERE {where}
+                                ''')        
 
-        print("Logró imprimir los items: {}".format(self.name))
-        connection.commit()
-        connection.close()
+            gotten = cursor.fetchall()
+            if inlist:
+                for got in gotten:
+                    self.armors = [
+                    got[0],
+                    got[1],
+                    got[2],
+                    got[3],
+                    got[4],
+                    got[5],
+                    got[6]
+                    ]
+                return self.armors
+            if inlist == False:
+                for got in gotten:
+                    self.armors[got[1]] = {
+                        'id' : got[0],
+                        'producto' : got[1],
+                        'descripcion' : got[2],
+                        'precio' : got[3],
+                        'nivel' : got[4],
+                        'fase' : got[5],
+                        'puntos de defensa' : got[6]
+                    }
+                return self.armors
+            connect.commit()
+            
 
-        return [self.name, self.price, self.lvl, self.stg]
 
-    def get_user_stats(self, userid: int):
-        """[summary]
+    def get_weapons(self,
+        where='',
+        inlist=False):
+        with sqlite3.connect('/home/lvoidi/Desktop/discord/src/database/shop.db') as connect:
+            cursor = connect.cursor()
+            if where == '':
 
-        Args:
-            userid (int): id del usuario
+                cursor.execute(r'''
+                                SELECT * FROM WEAPON 
 
-        Returns:
-            List: List with user stats
-        """
-        self.id = userid
+                                ''')
+            else:
+                cursor.execute(f'''
+                                SELECT * FROM WEAPON WHERE {where}
+                                ''')        
+
+            gotten = cursor.fetchall()
+
+            if inlist:
+                for got in gotten:
+                    self.weapons = [
+                    got[0],
+                    got[1],
+                    got[2],
+                    got[3],
+                    got[4],
+                    got[5],
+                    got[6]
+                    ]
+                return self.weapons
+            if inlist == False:
+                for got in gotten:
+                    self.weapons[f"{got[1]}"] = {
+                        'id' : got[0],
+                        'producto' : got[1],
+                        'descripcion' : got[2],
+                        'precio' : got[3],
+                        'nivel' : got[4],
+                        'fase' : got[5],
+                        'puntos de defensa' : got[6]
+                    }
+                return self.weapons
+            connect.commit()
+            
+
+
+    def get_items(self,
+        where='',
+        inlist=False):
+        with sqlite3.connect('/home/lvoidi/Desktop/discord/src/database/shop.db') as connect:
+            cursor = connect.cursor()
+            if where == '':
+
+                cursor.execute(r'''
+                                SELECT * FROM ITEM 
+
+                                ''')
+            else:
+                cursor.execute(f'''
+                                SELECT * FROM ITEM WHERE {where}
+                                ''')        
+
+            gotten = cursor.fetchall()
+
+            if inlist:
+                for got in gotten:
+                    self.weapons = [
+                    got[0],
+                    got[1],
+                    got[2],
+                    got[3],
+                    got[4],
+                    got[5]
+                    ]
+
+                return self.armors
+            if inlist == False:
+                for got in gotten:
+                    self.items[f"{got[1]}"] = {
+                        'id' : got[0],
+                        'producto' : got[1],
+                        'descripcion' : got[2],
+                        'precio' : got[3],
+                        'nivel' : got[4],
+                        'fase' : got[5],
+                    }
+                return self.items
+            connect.commit()
+
+class User:
+    def __init__(self):
+        self.stats_list = []
+        self.stats_dict = {}
+        
+
+    def get_by(self, username='', id=0, where='', inlist=False):
+        with sqlite3.connect('/home/lvoidi/Desktop/discord/src/database/users_data.db') as con:
+            cur = con.cursor()
+
+            if where == '':
+                if username != '':
+                    cur.execute('SELECT * FROM USERS WHERE USERNAME={}'.format(username))
+
+                if id != 0:
+                    cur.execute('SELECT * FROM USERS WHERE ID={}'.format(id))
+
+            else:
+                if username != '':
+                    cur.execute('SELECT * FROM USERS WHERE {}'.format(where))
+
+                if id != 0:
+                    cur.execute('SELECT * FROM USERS WHERE {}'.format(where))
+            stats = cur.fetchall()
+
+            con.commit()
+        c = 0
+        if inlist:
+            for stat in stats:
+
+
+                for x in range(len(stat)):
+                    self.stats_list.append(stat[c])
+                    c += 1
+            return self.stats_list
+
+        else:
+            for stat in stats:
+                self.stats_dict = {
+                    'id' : stat[0],
+                    'username' : stat[1],
+                    'balance' : stat[2],
+                    'nivel' : stat[3],
+                    'fase' : stat[4],
+                    'xp' : stat[5]
+                }
+            return self.stats_dict
+
+class Inventory:
+    def __init__(self):
+        self.inventory_list = []
+        self.inventory_dict = {}
+
+    def fetch_inventory(self, where='', inlist=False, usr=''):
         with sqlite3.connect('/home/lvoidi/Desktop/discord/src/database/users_data.db') as connection:
             cursor = connection.cursor()
-            cursor.execute('SELECT * FROM USERS WHERE ID={}'.format(userid))
-            the_stats = cursor.fetchall()
+
+            cursor.execute('SELECT * FROM {}_INV WHERE {}'.format(usr, where))
+            items = cursor.fetchall()
 
             connection.commit()
 
-        for stat in the_stats:
-            self.username = stat[1]
-            self.user_balance = stat[2]
-            self.user_level = stat[3]
-            self.user_stage = stat[4]
-            self.user_xp = stat[5]
+        if inlist:
+            for item in items:
+                self.inventory_list.append(item[0])
+                self.inventory_list.append(item[1])
+                self.inventory_list.append(item[2])
+                self.inventory_list.append(item[3])
+                self.inventory_list.append(item[4])
 
-        return [self.username, self.user_balance, self.user_level, self.user_stage, self.user_xp]
+            return self.inventory_list
 
-    def is_valid(self, user_id):
-        """[summary]
-
-        Args:
-            user_id (int): id del usuario
-
-        Returns:
-            Bool: If user has valid stats, returns True, except if there's an invalid stat
-        """
-
-        stats = self.get_user_stats(user_id)
-        print(self.price, self.lvl, self.stg, "\n Los stats del jugador: ", stats[1], stats[2], stats[3])
-        if stats[1] > self.price and stats[2] >= self.lvl and stats[3] >= self.stg:
-            return True
         else:
-            return False
+            for item in items:
+                self.inventory_dict[item[0]] = {
+                'id' : item[0],
+                'producto' : item[1],
+                'uso' : item[2],
+                'precio' : item[3],
+                'repeticiones' : item[4],
+                }
+            return self.inventory_dict
 
-    def inventory_insert(self, username: str, item: str):
+
+
+
+class Rpg:
+    def __init__(self):
+        self.item = Item()
+        self.user_class = User()
+        self.inventory = Inventory()
+
+    def inventory_insert(self, user: str, item: str, user_id: int):
+
+        # Saca los datos necesarios del usuario
+        usr = self.user_class.get_by(id=user_id)
+        balance = usr.get('balance')
+        username = usr.get('username')
+
+        # Saca los datos necesarios del inventario
+        inv = self.inventory.fetch_inventory(usr=username, where='REP>=0')
+        list_items = []
+        print(inv)
+        
+        keys = inv.keys()
+
+        print(keys)
+
+        for key in keys:
+            dict_all = inv.get(key)
+            repe = dict_all.get('repeticiones')
+            if repe >=1:
+                list_items.append({dict_all.get('producto') : dict_all})
+                print(list_items)
+            else:
+                continue
+
+        
+        for dictionary in list_items:
+            for k in dictionary.keys():
+                dict_items = dictionary.get(k)
+                rep = dict_items.get('repeticiones')
+                price = dict_items.get('precio')
+
+                print('rep: ', rep, 'price: ', price)
+
         with sqlite3.connect('/home/lvoidi/Desktop/discord/src/database/users_data.db') as connection:
             try:
+                rep += 1
+                print('new rep:', rep)
                 cursor = connection.cursor()
-                new_balance = self.user_balance - self.price
-                print("\n\na XD")
-                cursor.execute(rf"UPDATE USERS SET BALANCE={new_balance} WHERE ID={self.id}")
-                print(rf"UPDATE USERS SET BALANCE={new_balance} WHERE ID={self.id}")
-                cursor.execute(rf'INSERT INTO {username}_INV VALUES ("{item}", "f")')
+                new_balance = balance - price
+                print(new_balance, 'a', balance, 'p', price)
+                cursor.execute(rf"UPDATE USERS SET BALANCE={new_balance} WHERE ID={user_id}")
+
+                cursor.execute(rf'UPDATE {username}_INV SET REP={rep} WHERE PRODUCT="{item}"')
 
                 connection.commit()
+
             except Exception as e:
                 print(e, type(e).__name__)
                 return False
-
-    def get_inventory(self, usr):
-        try:
-            with sqlite3.connect('/home/lvoidi/Desktop/discord/src/database/users_data.db') as con:
-                cursor = con.cursor()
-                inv = self.get_user_stats(userid=usr)
-
-                cursor.execute(f"SELECT * FROM {inv[0]}_INV")
-
-                the_inventory = cursor.fetchall()
-                con.commit()
-                for item in the_inventory:
-                    string_1 = f'{item[0]}'
-                    if item[1].lower() == 'f':
-                        string_2 = 'Aun no está en uso'
-                    else:
-                        string_2 = 'Está en uso actualmente'
-
-                return string_1, string_2
-        except (UnboundLocalError, Exception):
-            return False

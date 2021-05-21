@@ -1,12 +1,15 @@
 import os
 from discord.ext import commands
 from discord.ext.commands.core import command
-from .rpg_manage import Rpg
+from .rpg_manage import Rpg, Item, User, Inventory
 import sys
 import discord
 class Rpg_2(commands.Cog):
      def __init__(self, bot):
+          self.item = Item()
           self.rpg = Rpg()
+          self.class_inventory = Inventory()
+          self.class_user = User()
           self.bot = bot
           self.GIFS = {
                "ARMOR" : {
@@ -41,31 +44,86 @@ class Rpg_2(commands.Cog):
      @commands.command()
      async def buy(self, ctx, id_product: int, section: str):
           try:
-               bought_item = self.rpg.shop_item(id=id_product, section=section)
-               gif_1 = self.GIFS.get(section.upper())
+               sect = self.item.section_parser(section=section)
+               print(sect)
+               if sect == 'ARMOR':
+                    obt = self.item.get_armors(where='ID={}'.format(id_product))
+
+               elif sect == 'WEAPON':     
+                    obt = self.item.get_weapons(where='ID={}'.format(id_product))
+
+               elif sect == 'ITEM':
+                    obt = self.item.get_items(where='ID={}'.format(id_product))
+
+               keys = obt.keys()
+               print(keys)
+               for key in keys:
+
+                    obtain_item = obt.get(key)
+               ip = obtain_item.get('precio')
+               il = obtain_item.get('nivel')
+               i_s = obtain_item.get('fase')
+
+               print('precio: ', ip, 'nivel:', il, 'fase', i_s)
+               user = self.class_user.get_by(id=ctx.message.author.id)
+               ub = user.get('balance')
+               ul = user.get('nivel')
+               us = user.get('fase') 
+
+               print('balance: ', ub, 'nivel:', ul, 'fase', us)
+               gif_1 = self.GIFS.get(sect)
                print(gif_1)
+
                gif_new = gif_1.get(id_product)
-               user = self.rpg.get_user_stats(
-                    userid=ctx.message.author.id
-               )
                
-               if self.rpg.is_valid(user_id=ctx.message.author.id):
+               
+
+
+               if ip >= ub and il >= ul and i_s >= us:
                     self.rpg.inventory_insert(
-                              username=user[0],
-                              item=self.rpg.name
+                              username=user.get('username'),
+                              item=obtain_item.get("producto"),
+                              user_id=ctx.message.author.id
                          )
+
                else:
-                    print("Id: ", ctx.message.author.id)
-                    await ctx.send("Al parecer no eres valido")
+                    embed = discord.Embed(
+                         color=discord.Color.red()
+                         )
+                    embed.title = "No cumples con las **estadísticas necesarias**"
+                    embed.add_field(
+                         name="El item pide **lo siguiente**",
+                         value=f"""
+                         >>> Vale **{ip}Ðþ**
+                         Tienes que tener nivel **{il}**
+                         Y tienes que estar en la **fase {i_s}**
+                         """,
+                         inline=True
+                         )
+
+                    embed.add_field(
+                         name="**Tus caracteristicas**",
+                         value=f"""
+                         >>> Dinero en la bolsa: **{ub}Ðþ**
+                         Tienes el **nivel {ul}**
+                         Estás en la **fase {us}**
+                         """,
+                         inline=True
+
+                         )
+                    embed.set_image(url='https://i.pinimg.com/originals/fd/e0/a8/fde0a82887c17d062a7a4e64aa7d56d2.gif')
+                    await ctx.send(embed = embed)
                     return
+
                embed = discord.Embed(
                     color=discord.Color.gold()
                )
                print(gif_new)
                embed.set_image(url=gif_new)
-               embed.title = "Has comprado exitosamente el item: {}".format(self.rpg.name)
+               embed.title = "Has comprado exitosamente el item: **{}**".format(obtain_item.get("producto"))
 
                await ctx.send(embed = embed)
+
           except Exception as e:
                exc_type, exc_obj, exc_tb = sys.exc_info()
                fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -75,7 +133,14 @@ class Rpg_2(commands.Cog):
      @commands.command()
      async def inventory(self, ctx):
           try:
-               lol = self.rpg.get_inventory(usr=ctx.message.author.id)
+               user = self.class_user.get_by(id=ctx.message.author.id)
+               username = user.get('username')
+
+               inv = self.class_inventory.fetch_inventory(where='REP>=1',usr=username)
+               print(inv)
+
+               inventory_keys = inv.keys()
+
 
                embed = discord.Embed(
                     color=discord.Color.random()
@@ -83,10 +148,21 @@ class Rpg_2(commands.Cog):
                embed.title = '¡Bienvenido a tu inventario, **aventurero**!'
                embed.description = "`Escribe **py!use (item)** para poder usarlo!`"
                
-               embed.add_field(
-                    name=lol[0],
-                    value=f'`{lol[1]}`'
-               )
+               for key in inventory_keys:
+                    it = inv.get(key)
+                    key_items = f"""
+                    'id' : `{it.get('id')}`,
+                     'producto' : `{it.get('producto')}`,
+                     'uso' : `{it.get('uso')}`,
+                     'precio' : `{it.get('precio')}`,
+                     'repeticiones' : `{it.get('repeticiones')}`,
+                    """
+                    embed.add_field(
+                         name=key,
+                         value=key_items
+                         )
+
+
                
                await ctx.send(embed = embed)
           except Exception as e:
