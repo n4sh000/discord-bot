@@ -1,4 +1,5 @@
 import discord
+from discord import message
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
 import colorama as c
@@ -15,11 +16,16 @@ startup_extensions = [
     "cogs.help",
     "cogs.on_error",
     "cogs.rpg.rpg",
-    "cogs.rpg.rpg_cogs"
+    "cogs.rpg.rpg_cogs",
+    "servermanage"
 ]
 
 # Bot instance
 bot = commands.Bot(command_prefix='py!', description='Beta version of this bot', help_command=None)
+
+
+
+
 
 
 @bot.event
@@ -41,7 +47,7 @@ async def ping(ctx):
     await ctx.send('{0}ms'.format(a))
     a = ''
     latency = ''
-    """
+"""
 @bot.command()
 async def xyz(ctx):
     await ctx.message.delete()
@@ -56,20 +62,9 @@ async def xyz(ctx):
 
     ***Link permanente del server:*** https://discord.gg/4zDWYyrReW
     
-    
-    embed.add_field(
-        name="¿Código fuente del bot?",
-        value='>>> Revisa el canal que dice "github"'
-    )
-    
     embed.add_field(
         name="¿Ayuda?",
-        value='>>> py!help es la solución!'
-    )
-    
-    embed.add_field(
-        name="Quiero aprender a programar!",
-        value='>>> Mira la sección de **cursos** c:'
+        value='>>> Vete a la categoría de **code y preguntas**!'
     )
     
     embed.add_field(
@@ -89,7 +84,7 @@ async def xyz(ctx):
     embed.set_image(url='https://media.discordapp.net/attachments/844732529474535436/844736774324355083/thedoor.png?width=811&height=456')
     
     await ctx.send(embed = embed)
-    """
+"""
 
 @bot.command()
 async def verify(ctx):
@@ -130,7 +125,24 @@ async def unload(extension_name: str):
     bot.unload_extension(extension_name)
     await bot.say("{} unloaded.".format(extension_name))
 
+@bot.event
+async def on_message(message):
+    if message.author == bot.user:
+        return
+    if message.content.startswith("py!verify") == False and message.channel.id == 844732529474535436:
+        msg = await message.channel.send("Por favor, escribe py!verify para verificarte y no pongas otras cosas!")
+        await message.delete()
+        await msg.delete(delay=3)
+        await bot.process_commands(message=message)
+        
+    else:
+        await bot.process_commands(message=message)
+        return
+    
+    
+    await bot.process_commands(message=message)
 
+    
 if __name__ == "__main__":
     for extension in startup_extensions:
         try:

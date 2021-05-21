@@ -75,8 +75,21 @@ class Rpg(commands.Cog):
         ]
         try:
             cursor.executemany('INSERT INTO USERS VALUES(?,?,?,?,?,?)', registro)
-            cursor.execute(f"CREATE TABLE {user}_INV(PRODUCT VARCHAR(50),USAGE CHAR)")
-            # cursor.execute(rf'INSERT INTO {user}_INV VALUES("Palo", "f")')
+            cursor.execute(rf"""CREATE TABLE {user}_INV(ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                            PRODUCT VARCHAR(50),
+                            USAGE CHAR,
+                            PRICE INTEGER,
+                            REP INTEGER)
+                            """)
+            ALL = [
+                ('Armadura no tan dura', "T", 50, 1),
+                ('Armadura de bronce', 'F', 85, 0),
+                ('Armadura sombria', "F", 105, 0),
+                ('Armadura de plomo', 'F', 135, 0),
+                ('Armadura de platino', 'F', 146, 0),
+                (),
+            ]
+            cursor.executemany(f"INSERT INTO {user}_INV VALUES(NULL, ?, ?, ?, ?)", ALL)
         except Exception as e:
             print("Excepcion found:", type(e), e)
             return False

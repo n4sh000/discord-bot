@@ -93,5 +93,15 @@ class Rpg_2(commands.Cog):
                print(type(e).__name__, e)
           
      
+     
+     
+     @commands.command()
+     async def sell(self, ctx, * ,item: str):
+          try:
+               print(self.rpg.sell_item(item=item, usr_id=ctx.message.author.id))
+          except Exception as e:
+               exc = f"{type(e).__name__}: {e}"
+               print(exc)
+     
 def setup(bot):
      bot.add_cog(Rpg_2(bot))
